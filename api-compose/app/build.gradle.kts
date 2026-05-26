@@ -41,7 +41,8 @@ android {
 
 dependencies {
 
-//    // Retrofit
+implementation(libs.androidx.material3)
+    //    // Retrofit
 //    implementation("com.squareup.retrofit2:retrofit:3.0.0")
 //    // JSON
 //    implementation("com.squareup.retrofit2:converter-gson:3.0.0")

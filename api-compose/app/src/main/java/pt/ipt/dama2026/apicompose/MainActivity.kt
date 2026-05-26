@@ -4,14 +4,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -31,10 +33,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             APIComposeTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()
-                    .padding(top = 40.dp)
+                Scaffold(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 40.dp)
                 ) { innerPadding ->
-                    NotaScreen(
+                    NotasScreen(
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -45,39 +49,40 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun NotaScreen(
+fun NotasScreen(
     modifier: Modifier = Modifier,
     vm: NotaViewModel = viewModel()
 ) {
-    val nota by vm.nota.collectAsState()
 
-    nota?.let {
+    val listaNotas by vm.notas.collectAsState()
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = it.title,
-                style = MaterialTheme.typography.headlineMedium
-            )
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items(listaNotas) { nota ->
+            Card {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = nota?.title ?: "",
+                        style = MaterialTheme.typography.titleLarge
+                    )
 
-            Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-            Text(text = it.description)
+                    Text(text = nota?.description ?: "")
 
-            Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
-            AsyncImage(
-                model = "https://adamastor.ipt.pt/api/imagens/" + it.image,
-                contentDescription = null,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-    } ?: run {
-        Box(modifier = Modifier.fillMaxSize()) {
-            CircularProgressIndicator()
+                    AsyncImage(
+                        model = "https://adamastor.ipt.pt/api/imagens/" + nota?.image?:"",
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
         }
     }
 }

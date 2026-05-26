@@ -8,10 +8,16 @@ import retrofit2.http.GET
  */
 interface NoteService {
 
+//    /**
+//     * ler os dados de uma Nota
+//     */
+//    @GET("api/Notes/1")
+//    suspend fun getNote(): Note
+
     /**
-     * ler os dados de uma Nota
+     * obter uma lista de notas, da API
      */
-    @GET("api/Notes/1")
-    suspend fun getNote(): Note
+    @GET("api/Notes")
+    suspend fun obterNotas(): List<Note>
 
 }

@@ -10,21 +10,21 @@ import pt.ipt.dama2026.apicompose.retrofit.RetrofitInstance
 
 class NotaViewModel : ViewModel() {
 
-    private val _nota = MutableStateFlow<Note?>(null)
-    val nota: StateFlow<Note?> = _nota
+    private val _notas = MutableStateFlow<List<Note?>>(emptyList())
+    val notas: StateFlow<List<Note?>> = _notas
 
     // Construtor
     init {
-        carregarNota()
+        carregarNotas()
     }
 
     /**
-     * lê os dados de uma nota através dos dados de uma API
+     * lê os dados das notas disponíveis através da API
      */
-    private fun carregarNota() {
+    private fun carregarNotas() {
         viewModelScope.launch {
             try {
-                _nota.value = RetrofitInstance.api.getNote()
+                _notas.value = RetrofitInstance.api.obterNotas()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
