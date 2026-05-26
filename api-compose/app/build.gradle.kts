@@ -40,6 +40,30 @@ android {
 }
 
 dependencies {
+
+//    // Retrofit
+//    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+//    // JSON
+//    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
+//    // ViewModel
+//    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+//    // Coil para imagens
+//    implementation("io.coil-kt:coil-compose:2.7.0")
+//    // Coroutines
+//    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
+
+    // Retrofit
+    implementation(libs.retrofit)
+    // JSON
+    implementation(libs.converter.gson)
+    // ViewModel
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    // Coil para imagens
+    implementation(libs.coil.compose)
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.android)
+
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
