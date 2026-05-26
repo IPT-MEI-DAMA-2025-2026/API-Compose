@@ -13,13 +13,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -56,37 +61,73 @@ fun NotasScreen(
 
     val listaNotas by vm.notas.collectAsState()
 
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        items(listaNotas) { nota ->
-            Card {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = nota?.title ?: "",
-                        style = MaterialTheme.typography.titleLarge
-                    )
+    // variáveis que vão recolher os dados da nova Nota
+    var titulo by remember { mutableStateOf("") }
+    var descricao by remember { mutableStateOf("") }
+    var foto by remember { mutableStateOf("") }
 
-                    Spacer(modifier = Modifier.height(8.dp))
 
-                    Text(text = nota?.description ?: "")
+    Column(modifier = modifier.fillMaxSize()) {
+        // FORMULÁRIO
+        Column(modifier = Modifier.padding(16.dp)) {
+            OutlinedTextField(
+                value = titulo,
+                onValueChange = { titulo = it },
+                label = { Text("titulo") }
+            )
+            OutlinedTextField(
+                value = descricao,
+                onValueChange = { descricao = it },
+                label = { Text("Descrição") }
+            )
+            OutlinedTextField(
+                value = foto,
+                onValueChange = { foto = it },
+                label = { Text("URL Foto") }
+            )
+            Button(
+                onClick = {
+                    vm.adicionarNota(titulo, descricao, foto)
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    titulo = ""
+                    descricao = ""
+                    foto = ""
+                }
+            ) { Text("Adicionar Nota") }
+        }
 
-                    AsyncImage(
-                        model = "https://adamastor.ipt.pt/api/imagens/" + nota?.image?:"",
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+
+        LazyColumn(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(listaNotas) { nota ->
+                Card {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = nota?.title ?: "",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(text = nota?.description ?: "")
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        AsyncImage(
+                            model = "https://adamastor.ipt.pt/api/imagens/" + nota?.image ?: "",
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
         }
     }
 }
-
 
 //
 //@Preview(showBackground = true)
