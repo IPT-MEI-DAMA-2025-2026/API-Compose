@@ -1,6 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt.android)
 }
 
 android {
@@ -41,28 +44,26 @@ android {
 
 dependencies {
 
-implementation(libs.androidx.material3)
-    //    // Retrofit
-//    implementation("com.squareup.retrofit2:retrofit:3.0.0")
-//    // JSON
-//    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
-//    // ViewModel
-//    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
-//    // Coil para imagens
-//    implementation("io.coil-kt:coil-compose:2.7.0")
-//    // Coroutines
-//    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
+
+    // Hilt
+    implementation("com.google.dagger:hilt-android:2.59.2")
+    implementation(libs.transport.runtime)
+    ksp("com.google.dagger:hilt-compiler:2.59.2")
+    implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
+
+
 
     // Retrofit
-    implementation(libs.retrofit)
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
     // JSON
-    implementation(libs.converter.gson)
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
     // ViewModel
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
     // Coil para imagens
-    implementation(libs.coil.compose)
+    implementation("io.coil-kt:coil-compose:2.7.0")
     // Coroutines
-    implementation(libs.kotlinx.coroutines.android)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
+
 
 
     implementation(platform(libs.androidx.compose.bom))

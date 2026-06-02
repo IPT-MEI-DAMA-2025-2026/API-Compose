@@ -1,49 +1,41 @@
-package pt.ipt.dama2026.apicompose.viewModel
+package pt.ipt.dama2026.apicompose.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import pt.ipt.dama2026.apicompose.model.Note
 import pt.ipt.dama2026.apicompose.model.NoteRequest
-import pt.ipt.dama2026.apicompose.retrofit.RetrofitInstance
+import pt.ipt.dama2026.apicompose.retrofit.service.NoteRepository
+import javax.inject.Inject
 
-class NotaViewModel : ViewModel() {
+@HiltViewModel
+class NotaViewModel @Inject constructor(
+    private val repository: NoteRepository
+) : ViewModel() {
 
-    private val _notas = MutableStateFlow<List<Note?>>(emptyList())
-    val notas: StateFlow<List<Note?>> = _notas
+    private val _notas = MutableStateFlow<List<Note>>(emptyList())
+    val notas: StateFlow<List<Note>> = _notas
 
-    // Construtor
     init {
-        carregarNotas()
+        loadNotas()
     }
 
-    /**
-     * lê os dados das notas disponíveis através da API
-     */
-    private fun carregarNotas() {
+    fun loadNotas() {
         viewModelScope.launch {
-            try {
-                _notas.value = RetrofitInstance.api.obterNotas().sortedByDescending { it.id }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            _notas.value = repository.getNotas().sortedByDescending { it.id }
         }
     }
 
-
-    fun adicionarNota(titulo: String, descricao: String, imagem: String) {
+    fun addNota(nome: String, descricao: String, foto: String) {
         viewModelScope.launch {
-            try {
-                val novaNota = RetrofitInstance.api.criarNota(
-                    NoteRequest(titulo, descricao, imagem)
-                )
-                // actualizar a lista de notas no ecrã
-                _notas.value += novaNota
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            val novaNota = repository.createNota(
+                NoteRequest(nome, descricao, foto)
+            )
+            _notas.value = _notas.value + novaNota
         }
     }
+
 }
