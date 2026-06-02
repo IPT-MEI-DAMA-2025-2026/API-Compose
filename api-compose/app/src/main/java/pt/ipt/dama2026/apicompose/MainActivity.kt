@@ -66,6 +66,10 @@ fun NotasScreen(
     var descricao by remember { mutableStateOf("") }
     var foto by remember { mutableStateOf("") }
 
+    // var auxiliar para a 'gestão de erros' do parâmetro "nome"
+    var nomeErro by remember { mutableStateOf<String?>(null) }
+
+
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Column(modifier = modifier.fillMaxSize()) {
@@ -73,8 +77,13 @@ fun NotasScreen(
         Column(modifier = Modifier.padding(16.dp)) {
             OutlinedTextField(
                 value = nome,
-                onValueChange = { nome = it },
-                label = { Text("Nome") }
+                onValueChange = {
+                    nome = it
+                    nomeErro = null
+                },
+                label = { Text("Nome") },
+                isError = nomeErro != null,
+                supportingText = { nomeErro?.let { Text(it) } }
             )
             OutlinedTextField(
                 value = descricao,
@@ -88,13 +97,25 @@ fun NotasScreen(
             )
             Button(
                 onClick = {
-                    vm.addNota(nome, descricao, foto)
-                    // fechar teclado
-                    keyboardController?.hide()
-                    // limpar campos
-                    nome = ""
-                    descricao = ""
-                    foto = ""
+                    // var. auxiliar para avaliar se há problemas com a adição do formulário
+                    var valido = true
+
+                    // avaliar o 'nome'
+                    if (nome.isBlank()) {
+                        valido = false
+                        nomeErro = "o campo NOME é de preenchimento obrigatório"
+                    }
+
+                    if (valido) {
+                        vm.addNota(nome, descricao, foto)
+
+                        // fechar teclado
+                        keyboardController?.hide()
+                        // limpar campos
+                        nome = ""
+                        descricao = ""
+                        foto = ""
+                    }
                 }
             ) { Text("Adicionar Nota") }
         }
