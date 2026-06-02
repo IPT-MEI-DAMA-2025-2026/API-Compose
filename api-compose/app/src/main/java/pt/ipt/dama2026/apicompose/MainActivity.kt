@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -82,9 +83,18 @@ fun NotasScreen(
                     nomeErro = null
                 },
                 label = { Text("Nome") },
-                isError = nomeErro != null,
-                supportingText = { nomeErro?.let { Text(it) } }
+                isError = nomeErro != null
             )
+            AnimatedVisibility(
+                visible = nomeErro!=null
+            ) {
+                Text(
+                    text=nomeErro?:"",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+
             OutlinedTextField(
                 value = descricao,
                 onValueChange = { descricao = it },
@@ -92,7 +102,7 @@ fun NotasScreen(
             )
             OutlinedTextField(
                 value = foto,
-                onValueChange = { foto = "noImage.jpg" },
+                onValueChange = { foto = it },
                 label = { Text("URL Foto") }
             )
             Button(
@@ -107,7 +117,7 @@ fun NotasScreen(
                     }
 
                     if (valido) {
-                        vm.addNota(nome, descricao, foto)
+                        vm.addNota(nome, descricao, "noImage.jpg")
 
                         // fechar teclado
                         keyboardController?.hide()
