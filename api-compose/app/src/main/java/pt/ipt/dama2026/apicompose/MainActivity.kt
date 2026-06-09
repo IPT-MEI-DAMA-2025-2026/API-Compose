@@ -62,13 +62,15 @@ fun NotasScreen(
 ) {
 
     val listaNotas by vm.notas.collectAsState()
+    val state by vm.uiState.collectAsState()
 
-    var nome by remember { mutableStateOf("") }
-    var descricao by remember { mutableStateOf("") }
-    var foto by remember { mutableStateOf("") }
 
-    // var auxiliar para a 'gestão de erros' do parâmetro "nome"
-    var nomeErro by remember { mutableStateOf<String?>(null) }
+//    var nome by remember { mutableStateOf("") }
+//    var descricao by remember { mutableStateOf("") }
+//    var foto by remember { mutableStateOf("") }
+//
+//    // var auxiliar para a 'gestão de erros' do parâmetro "nome"
+//    var nomeErro by remember { mutableStateOf<String?>(null) }
 
 
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -77,55 +79,57 @@ fun NotasScreen(
         // FORMULÁRIO
         Column(modifier = Modifier.padding(16.dp)) {
             OutlinedTextField(
-                value = nome,
-                onValueChange = {
-                    nome = it
-                    nomeErro = null
-                },
+                value = state.nome,
+                onValueChange = vm::onNomeChanged,
                 label = { Text("Nome") },
-                isError = nomeErro != null
+                isError = state.nomeErro != null
             )
             AnimatedVisibility(
-                visible = nomeErro!=null
+                visible = state.nomeErro!=null
             ) {
                 Text(
-                    text=nomeErro?:"",
+                    text = state.nomeErro ?: "",
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
 
             OutlinedTextField(
-                value = descricao,
-                onValueChange = { descricao = it },
+                value = state.descricao,
+                onValueChange = vm::onDescicaoChanged,
                 label = { Text("Descrição") }
             )
             OutlinedTextField(
-                value = foto,
-                onValueChange = { foto = it },
+                value = state.foto,
+                onValueChange = vm::onFotoChanged,
                 label = { Text("URL Foto") }
             )
             Button(
                 onClick = {
-                    // var. auxiliar para avaliar se há problemas com a adição do formulário
-                    var valido = true
+//                    Aqui já não há necessidade destas variáveis para validar os dados
+//                    obtidos do formulário, porque esse trabalho passou para a VM
+//
+//                    // var. auxiliar para avaliar se há problemas com a adição do formulário
+//                    var valido = true
+//
+//                    // avaliar o 'nome'
+//                    if (nome.isBlank()) {
+//                        valido = false
+//                        nomeErro = "o campo NOME é de preenchimento obrigatório"
+//                    }
 
-                    // avaliar o 'nome'
-                    if (nome.isBlank()) {
-                        valido = false
-                        nomeErro = "o campo NOME é de preenchimento obrigatório"
-                    }
-
-                    if (valido) {
-                        vm.addNota(nome, descricao, "noImage.jpg")
+//                    if (valido) {
+//                        vm.addNota(nome, descricao, "noImage.jpg")
+                    vm.addNota()
 
                         // fechar teclado
                         keyboardController?.hide()
-                        // limpar campos
-                        nome = ""
-                        descricao = ""
-                        foto = ""
-                    }
+//                        esta tarefa foi também transferida para o VM
+//                        // limpar campos
+//                        nome = ""
+//                        descricao = ""
+//                        foto = ""
+//                    }
                 }
             ) { Text("Adicionar Nota") }
         }
