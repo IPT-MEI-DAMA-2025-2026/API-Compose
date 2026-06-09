@@ -3,8 +3,10 @@ package pt.ipt.dama2026.apicompose.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pt.ipt.dama2026.apicompose.model.Note
@@ -27,6 +29,12 @@ class NotaViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(NotaUiState())
     // atributo a ser consumido pela interface
     val uiState: StateFlow<NotaUiState> = _uiState
+
+    // vars para fazer a gestão do evento
+    // neste caso só existe um evento após a adição de uma nota, com sucesso
+    private val _events = MutableSharedFlow<UiEvent>()
+    val events=_events.asSharedFlow()
+
 
     init {
         loadNotas()
@@ -77,6 +85,8 @@ class NotaViewModel @Inject constructor(
             return
         }
 
+        // se chegar aqui, o nome é válido
+        // podemos adicionar a nota na API
         viewModelScope.launch {
             val novaNota = repository.createNota(
                 NoteRequest(
@@ -96,6 +106,11 @@ class NotaViewModel @Inject constructor(
                     nomeErro = null
                 )
             }
+
+            // gerar o evento a informar que houve sucesso na adição
+            _events.emit(
+                UiEvent.ShowMessage("Nota adicionada com sucesso")
+            )
         }
     }
 

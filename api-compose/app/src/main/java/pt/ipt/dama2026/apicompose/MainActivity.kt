@@ -20,14 +20,17 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -35,6 +38,7 @@ import coil.compose.AsyncImage
 import dagger.hilt.android.AndroidEntryPoint
 import pt.ipt.dama2026.apicompose.ui.theme.APIComposeTheme
 import pt.ipt.dama2026.apicompose.viewmodel.NotaViewModel
+import pt.ipt.dama2026.apicompose.viewmodel.UiEvent
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -43,12 +47,31 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             APIComposeTheme {
+
+                // var auxiliar para a gestão do estado do snackbar
+                val snackbarHostState = remember { SnackbarHostState() }
+
                 Scaffold(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(top = 40.dp)
+                        .padding(top = 40.dp),
+                    snackbarHost = {
+                        SnackbarHost(
+                            hostState = snackbarHostState,
+                            snackbar = { snackbarData ->
+                                Snackbar(
+                                    snackbarData = snackbarData,
+                                    containerColor = Color.Red, //Color(0xFF4CAF50),
+                                    contentColor = Color.White
+                                )
+                            }
+                        )
+                    }
                 ) { innerPadding ->
-                    NotasScreen(modifier = Modifier.padding(innerPadding))
+                    NotasScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        snackbarHostState
+                        )
                 }
             }
         }
@@ -58,6 +81,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun NotasScreen(
     modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState,
     vm: NotaViewModel = hiltViewModel()
 ) {
 
@@ -75,6 +99,22 @@ fun NotasScreen(
 
     val keyboardController = LocalSoftwareKeyboardController.current
 
+
+    // gestor do evento de guardar uma Nota
+    LaunchedEffect(Unit) {
+        vm.events.collect { event ->
+            when(event) {
+                is UiEvent.ShowMessage -> {
+                    snackbarHostState.showSnackbar(
+                        event.message
+                    )
+                }
+            }
+        }
+    }
+
+
+
     Column(modifier = modifier.fillMaxSize()) {
         // FORMULÁRIO
         Column(modifier = Modifier.padding(16.dp)) {
@@ -85,7 +125,7 @@ fun NotasScreen(
                 isError = state.nomeErro != null
             )
             AnimatedVisibility(
-                visible = state.nomeErro!=null
+                visible = state.nomeErro != null
             ) {
                 Text(
                     text = state.nomeErro ?: "",
@@ -122,8 +162,8 @@ fun NotasScreen(
 //                        vm.addNota(nome, descricao, "noImage.jpg")
                     vm.addNota()
 
-                        // fechar teclado
-                        keyboardController?.hide()
+                    // fechar teclado
+                    keyboardController?.hide()
 //                        esta tarefa foi também transferida para o VM
 //                        // limpar campos
 //                        nome = ""
